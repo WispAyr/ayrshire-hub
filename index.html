@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WispAyr — Local Intelligence for Ayrshire</title>
+<meta name="description" content="Live local data tools for Ayrshire, Scotland. Fuel prices, train tracking, bus maps and more.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #f8fafc;
+  --bg-card: #ffffff;
+  --text: #0f172a;
+  --text-muted: #64748b;
+  --text-light: #94a3b8;
+  --border: #e2e8f0;
+  --blue: #2563eb;
+  --blue-light: #3b82f6;
+  --blue-dark: #1d4ed8;
+  --blue-bg: #eff6ff;
+  --cyan: #06b6d4;
+  --cyan-bg: #ecfeff;
+  --green: #16a34a;
+  --green-bg: #f0fdf4;
+  --orange: #ea580c;
+  --orange-bg: #fff7ed;
+  --purple: #7c3aed;
+  --purple-bg: #f5f3ff;
+  --radius: 16px;
+  --radius-sm: 10px;
+  --shadow: 0 1px 3px rgba(0,0,0,.06), 0 2px 8px rgba(0,0,0,.04);
+  --shadow-md: 0 4px 16px rgba(0,0,0,.08), 0 2px 4px rgba(0,0,0,.04);
+  --shadow-lg: 0 12px 40px rgba(0,0,0,.12);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Inter', -apple-system, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+a { color: inherit; text-decoration: none; }
+
+/* ── Header ── */
+.header {
+  background: white;
+  border-bottom: 1px solid var(--border);
+  padding: 16px 0;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  backdrop-filter: blur(12px);
+  background: rgba(255,255,255,0.9);
+}
+.header .container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.logo-mark {
+  width: 36px;
+  height: 36px;
+  background: linear-gradient(135deg, var(--blue), var(--cyan));
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 900;
+  font-size: 16px;
+  letter-spacing: -1px;
+}
+.logo h1 {
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+}
+.logo h1 span { color: var(--blue); }
+.header-links {
+  display: flex;
+  gap: 20px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-muted);
+}
+.header-links a:hover { color: var(--text); }
+
+/* ── Container ── */
+.container { max-width: 1080px; margin: 0 auto; padding: 0 24px; }
+
+/* ── Hero ── */
+.hero {
+  text-align: center;
+  padding: 64px 0 48px;
+}
+.hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--blue-bg);
+  color: var(--blue);
+  font-size: 13px;
+  font-weight: 600;
+  padding: 6px 14px;
+  border-radius: 20px;
+  margin-bottom: 20px;
+  border: 1px solid var(--blue);
+  border-color: rgba(37,99,235,0.15);
+}
+.hero h2 {
+  font-size: 44px;
+  font-weight: 900;
+  letter-spacing: -1.5px;
+  line-height: 1.1;
+  margin-bottom: 16px;
+}
+.hero h2 .gradient {
+  background: linear-gradient(135deg, var(--blue), var(--cyan));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.hero p {
+  font-size: 18px;
+  color: var(--text-muted);
+  max-width: 540px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+/* ── Tool Cards ── */
+.tools-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 20px;
+  margin-bottom: 48px;
+}
+.tool-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 28px;
+  box-shadow: var(--shadow);
+  transition: all 200ms ease;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+.tool-card:hover {
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-3px);
+  border-color: transparent;
+}
+.tool-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  border-radius: var(--radius) var(--radius) 0 0;
+  opacity: 0;
+  transition: opacity 200ms ease;
+}
+.tool-card:hover::before { opacity: 1; }
+.tool-card.fuel::before { background: linear-gradient(90deg, var(--green), var(--cyan)); }
+.tool-card.trains::before { background: linear-gradient(90deg, var(--blue), var(--purple)); }
+.tool-card.coming::before { background: linear-gradient(90deg, var(--orange), #f59e0b); }
+
+.tool-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  margin-bottom: 16px;
+}
+.tool-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  flex-shrink: 0;
+}
+.tool-icon.fuel { background: var(--green-bg); }
+.tool-icon.trains { background: var(--blue-bg); }
+.tool-icon.coming { background: var(--orange-bg); }
+
+.tool-info h3 {
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: -0.3px;
+  margin-bottom: 2px;
+}
+.tool-tag {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 2px 8px;
+  border-radius: 4px;
+  display: inline-block;
+}
+.tool-tag.live { background: #dcfce7; color: #15803d; }
+.tool-tag.beta { background: #fef3c7; color: #a16207; }
+.tool-tag.soon { background: #f1f5f9; color: #64748b; }
+
+.tool-desc {
+  color: var(--text-muted);
+  font-size: 14px;
+  line-height: 1.6;
+  margin-bottom: 20px;
+  flex: 1;
+}
+.tool-features {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+.feature-tag {
+  font-size: 12px;
+  color: var(--text-muted);
+  background: var(--bg);
+  padding: 4px 10px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+}
+.tool-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--blue);
+  transition: gap 200ms ease;
+}
+.tool-card:hover .tool-cta { gap: 10px; }
+.tool-cta.disabled { color: var(--text-light); pointer-events: none; }
+
+/* ── Stats Bar ── */
+.stats-bar {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px 32px;
+  display: flex;
+  justify-content: space-around;
+  margin-bottom: 48px;
+  box-shadow: var(--shadow);
+}
+.stat-item { text-align: center; }
+.stat-num {
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: -1px;
+  background: linear-gradient(135deg, var(--blue), var(--cyan));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.stat-label {
+  font-size: 12px;
+  color: var(--text-muted);
+  font-weight: 500;
+  margin-top: 2px;
+}
+
+/* ── About ── */
+.about {
+  text-align: center;
+  padding: 32px 0 64px;
+  max-width: 600px;
+  margin: 0 auto;
+}
+.about h3 {
+  font-size: 22px;
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+.about p {
+  font-size: 15px;
+  color: var(--text-muted);
+  line-height: 1.7;
+}
+
+/* ── Footer ── */
+footer {
+  border-top: 1px solid var(--border);
+  padding: 24px 0;
+  text-align: center;
+  font-size: 13px;
+  color: var(--text-light);
+}
+footer a { color: var(--blue); }
+
+/* ── Mobile ── */
+@media (max-width: 768px) {
+  .hero { padding: 40px 0 32px; }
+  .hero h2 { font-size: 32px; }
+  .hero p { font-size: 16px; }
+  .tools-grid { grid-template-columns: 1fr; }
+  .stats-bar { flex-direction: column; gap: 16px; padding: 20px; }
+  .stat-num { font-size: 24px; }
+  .header-links { display: none; }
+}
+@media (max-width: 480px) {
+  .hero h2 { font-size: 26px; }
+  .hero p { font-size: 14px; }
+  .container { padding: 0 16px; }
+  .tool-card { padding: 20px; }
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="container">
+    <a class="logo" href="/">
+      <div class="logo-mark">W</div>
+      <h1>Wisp<span>Ayr</span></h1>
+    </a>
+    <div class="header-links">
+      <a href="https://fuel.wispayr.online">Fuel</a>
+      <a href="https://trains.wispayr.online">Trains</a>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="hero">
+    <div class="hero-badge">📍 Ayrshire, Scotland</div>
+    <h2>Local intelligence,<br><span class="gradient">live data.</span></h2>
+    <p>Free tools that help you navigate Ayrshire smarter — from fuel prices to live transport. Built here, for here.</p>
+  </div>
+
+  <div class="tools-grid">
+    <!-- FuelPulse -->
+    <a href="https://fuel.wispayr.online" class="tool-card fuel">
+      <div class="tool-header">
+        <div class="tool-icon fuel">⛽</div>
+        <div class="tool-info">
+          <h3>FuelPulse</h3>
+          <span class="tool-tag live">Live</span>
+        </div>
+      </div>
+      <p class="tool-desc">Real-time fuel prices across Ayrshire. See what's cheapest, what's open, and where the queues are. Powered by UK Government open data.</p>
+      <div class="tool-features">
+        <span class="feature-tag">Live prices</span>
+        <span class="feature-tag">Open/closed status</span>
+        <span class="feature-tag">Price trends</span>
+        <span class="feature-tag">Supply alerts</span>
+        <span class="feature-tag">Community reports</span>
+      </div>
+      <span class="tool-cta">Open FuelPulse →</span>
+    </a>
+
+    <!-- TrainTracker -->
+    <a href="https://trains.wispayr.online" class="tool-card trains">
+      <div class="tool-header">
+        <div class="tool-icon trains">🚂</div>
+        <div class="tool-info">
+          <h3>Ayrshire Rail & Bus</h3>
+          <span class="tool-tag live">Live</span>
+        </div>
+      </div>
+      <p class="tool-desc">Live map of every bus and train in Ayrshire. ScotRail delays, Stagecoach routes, real-time positions. Signal panel and Marey diagrams for rail geeks.</p>
+      <div class="tool-features">
+        <span class="feature-tag">Live bus map</span>
+        <span class="feature-tag">Train tracking</span>
+        <span class="feature-tag">70+ buses</span>
+        <span class="feature-tag">Signal panel</span>
+        <span class="feature-tag">Marey diagram</span>
+      </div>
+      <span class="tool-cta">Open Rail & Bus →</span>
+    </a>
+
+    <!-- Coming Soon -->
+    <div class="tool-card coming">
+      <div class="tool-header">
+        <div class="tool-icon coming">🔧</div>
+        <div class="tool-info">
+          <h3>What's Next?</h3>
+          <span class="tool-tag soon">Coming soon</span>
+        </div>
+      </div>
+      <p class="tool-desc">We're building more local tools. Traffic conditions, road closures, weather alerts, local events — all in one place. Got an idea? Let us know.</p>
+      <div class="tool-features">
+        <span class="feature-tag">Traffic</span>
+        <span class="feature-tag">Road closures</span>
+        <span class="feature-tag">Weather</span>
+        <span class="feature-tag">Events</span>
+      </div>
+      <span class="tool-cta disabled">Coming soon</span>
+    </div>
+  </div>
+
+  <div class="stats-bar" id="statsBar">
+    <div class="stat-item">
+      <div class="stat-num" id="stationCount">—</div>
+      <div class="stat-label">Fuel Stations</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num" id="busCount">—</div>
+      <div class="stat-label">Live Buses</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num" id="trainCount">—</div>
+      <div class="stat-label">Live Trains</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num" id="cheapestPrice">—</div>
+      <div class="stat-label">Cheapest E10</div>
+    </div>
+  </div>
+
+  <div class="about">
+    <h3>Built in Ayrshire, for Ayrshire</h3>
+    <p>WispAyr is a local tech project creating free, open tools for the community. No ads, no tracking, no nonsense — just useful data presented clearly. All powered by open government data and public transport feeds.</p>
+  </div>
+</div>
+
+<footer>
+  <div class="container">
+    <p>© 2026 <a href="https://wispayr.online">WispAyr</a> · Ayr, Scotland · Open data, open tools</p>
+  </div>
+</footer>
+
+<script>
+// Pull live stats from the actual services
+async function loadStats() {
+  try {
+    const [fuelResp, busResp, trainResp] = await Promise.allSettled([
+      fetch('https://fuel.wispayr.online/api/stations').then(r => r.json()),
+      fetch('https://trains.wispayr.online/api/buses').then(r => r.json()),
+      fetch('https://trains.wispayr.online/api/all').then(r => r.json()),
+    ]);
+
+    if (fuelResp.status === 'fulfilled') {
+      const stations = fuelResp.value.stations || fuelResp.value || [];
+      document.getElementById('stationCount').textContent = stations.length;
+      // Find cheapest E10
+      let cheapest = Infinity;
+      stations.forEach(s => {
+        (s.prices || []).forEach(p => {
+          if (p.fuel_type === 'E10' && p.price && p.price < cheapest) cheapest = p.price;
+        });
+      });
+      if (cheapest < Infinity) {
+        document.getElementById('cheapestPrice').textContent = cheapest.toFixed(1) + 'p';
+      }
+    }
+
+    if (busResp.status === 'fulfilled') {
+      const buses = Array.isArray(busResp.value) ? busResp.value : [];
+      document.getElementById('busCount').textContent = buses.length;
+    }
+
+    if (trainResp.status === 'fulfilled') {
+      const trains = trainResp.value.trains || [];
+      document.getElementById('trainCount').textContent = trains.length;
+    }
+  } catch (e) {
+    console.warn('Stats fetch error:', e);
+  }
+}
+
+loadStats();
+setInterval(loadStats, 60000);
+</script>
+</body>
+</html>
